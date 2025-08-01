@@ -1,0 +1,57 @@
+
+✅ Cursor AI Prompt (for Kilo Code BioLink Website)
+
+> Task: Improve and finalize my BioLinks website project named LinkNest. Below are detailed instructions you should follow and implement step-by-step.
+
+🔷 Brand Details
+- Website Name: LinkNest
+- Landing Page CTA: “Turn followers into clicks.”
+- Builder Page CTA: “Real-time preview. Real-time magic.”
+
+🔧 Key Functional Fixes & Improvements
+
+1. Live Preview System  
+   - Implement real-time preview on the builder page.  
+   - As soon as the user types in any input field (like name, bio, links), the right-side mobile preview should instantly reflect the changes live, without needing to click submit or reload.  
+   - This includes:
+     - Name & Bio section
+     - Link buttons and labels
+     - Theme changes (colors/fonts/styles)
+
+2. Export Function Fix  
+   - Fix the export/download button so that it downloads the customized version of the link page with the user’s actual input data, not just the default template.  
+   - Ensure that all custom content (name, bio, links, selected theme) is embedded in the downloaded HTML.
+
+🧪 Additional Enhancements
+
+3. Meta + SEO Tags
+   - Add meta title and meta description tags on each page.  
+   - Add Open Graph (OG) tags for better preview on WhatsApp, Twitter, etc. Use sample content for now; we’ll replace with dynamic later.
+
+4. Micro Animations (optional but desired)  
+   Suggest adding:
+   - Smooth fade/scale-in animations for theme cards  
+   - Hover bounce for CTA buttons  
+   - Slide-in or shimmer glow for preview pane  
+   - Confetti or tick animation on successful export
+
+5. Form Validation  
+   - Basic validation for name and links (non-empty, valid format)
+
+6. ToS & Privacy Footer (optional stub)  
+   - Placeholder sections for “Terms of Service” and “Privacy Policy” in the footer
+
+7. Add Favicon and Manifest (optional PWA-ready)
+
+✅ Tech Expectations
+- Use React or Next.js (if already using)
+- Use useState and useEffect hooks to trigger real-time updates
+- Data persistence can be done via localStorage or context/state
+- Ensure performance isn’t compromised by live updates
+- Code should be clean, modular, and scalable
+
+🎯 Goal
+Deliver a final version of the LinkNest builder that:
+- Reflects all user inputs in real time
+- Generates a fully functional, downloadable version of the user’s page
+- Looks polished, lightweight, and aesthetic

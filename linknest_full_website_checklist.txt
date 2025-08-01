@@ -1,0 +1,84 @@
+
+📦 LinkNest Website Content & Development Checklist
+
+━━━━━━━━━━━━━━━━━━━━━━
+✅ PRICING PAGE REVIEW (9/10)
+━━━━━━━━━━━━━━━━━━━━━━
+✓ Clean modern SaaS layout
+✓ Tiered pricing (Free, Basic, Pro)
+✓ Highlight on Most Popular (Pro)
+✓ Trust elements: encryption, refund, no hidden fees
+✓ CTA: “Ready to Build Your Link in Bio?”
+
+Improvements:
+- Add a thin pink-purple [matching the color scheme of the website] around the basic subscription in pricing page. Replace "most popular" tag from pro subscription to basic subscription.
+- Animated toggle between Monthly/Yearly
+- Scroll-based fade-ins for FAQ
+- Animated checkmarks on features
+
+━━━━━━━━━━━━━━━━━━━━━━
+📋 FAQ ALIGNMENT CHECK
+━━━━━━━━━━━━━━━━━━━━━━
+✓ Cancel anytime? → Aligned
+✓ Refund policy? → Add refund timeline (5–7 days)
+✓ Billing? → Add emphasis on auto-renew
+✓ Upgrade/downgrade? → Add mention of proration
+
+━━━━━━━━━━━━━━━━━━━━━━
+📄 CONTENT FOR ADDITIONAL PAGES
+━━━━━━━━━━━━━━━━━━━━━━
+
+🧩 FEATURES PAGE
+-----------------
+Headline:
+"Why LinkNest? Everything You Need to Convert Clicks."
+
+Sections:
+- Custom domains
+- Real-time editor
+- Drag & drop blocks
+- Themes & Templates
+- Analytics dashboard
+- Performance & CDN
+- Security (256-bit SSL)
+
+📌 Prompt for Cursor:
+"Create a modern Features page for LinkNest with headline: 'Why LinkNest? Everything You Need to Convert Clicks.' Layout should use feature grid with icons and text, animate on scroll, match site theme, fully responsive."
+
+🎨 TEMPLATES PAGE
+-----------------
+Headline:
+"Pick a Look That Suits You"
+
+Sections:
+- Template cards with preview
+- Filters: Minimal, Dark, Bold, Personal
+- Buttons: Use This Template
+
+📌 Prompt for Cursor:
+"Design a Templates page with card-style layout. Include filter buttons and a responsive grid showing preview, name, and 'Use This Template' button. Add CSS preview animation on hover."
+
+🆘 SUPPORT PAGE
+-----------------
+Headline:
+"Need Help? We've Got You."
+
+Sections:
+- Getting Started
+- Domain Setup
+- Billing & Pricing
+- FAQ
+- Contact Support Button (sticky)
+
+📌 Prompt for Cursor:
+"Create a Support page for LinkNest with sections: Getting Started, Domain Setup, Billing, FAQ. Use accordion layout for questions. Sticky Contact Support button on right side. Match the site's visual style."
+
+━━━━━━━━━━━━━━━━━━━━━━
+📢 WEBSITE CTA IDEAS
+━━━━━━━━━━━━━━━━━━━━━━
+- “Ready to Build Your Link in Bio?”
+- “Start Creating. Start Converting.”
+- “Turn Clicks into Conversions.”
+- “Join 1000+ Creators Using LinkNest Today.”
+- “All-in-One Bio Page, Just One Link Away.”
+

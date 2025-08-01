@@ -1,0 +1,37 @@
+/* Theme-specific CSS variables */
+
+.theme-modern {
+  --primary: #3b82f6;
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --accent: #f3f4f6;
+}
+
+.theme-nature {
+  --primary: #10b981;
+  --background: #f0fdf4;
+  --foreground: #064e3b;
+  --accent: #d1fae5;
+}
+
+.theme-sunset {
+  --primary: #f59e0b;
+  --background: #fef3c7;
+  --foreground: #92400e;
+  --accent: #fde68a;
+}
+
+.theme-dark {
+  --primary: #6366f1;
+  --background: #1f2937;
+  --foreground: #f9fafb;
+  --accent: #374151;
+}
+
+/* Custom theme variables */
+.theme-custom {
+  --primary: var(--custom-primary, #3b82f6);
+  --background: var(--custom-background, #ffffff);
+  --foreground: var(--custom-foreground, #1f2937);
+  --accent: var(--custom-accent, #f3f4f6);
+} 

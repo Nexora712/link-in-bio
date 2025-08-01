@@ -1,0 +1,582 @@
+<div class="isometric-template">
+  <div class="world-container">
+    <div class="floating-island island-1">
+      <div class="island-base"></div>
+      <div class="island-decoration tree"></div>
+    </div>
+    <div class="floating-island island-2">
+      <div class="island-base"></div>
+      <div class="island-decoration crystal"></div>
+    </div>
+    <div class="floating-island island-3">
+      <div class="island-base"></div>
+      <div class="island-decoration building"></div>
+    </div>
+    
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+  </div>
+  
+  <div class="main-platform">
+    <section class="character-profile">
+      <div class="avatar-cube">
+        <div class="cube-face front">
+          <img src="{{avatar_url}}" alt="{{user_name}}" class="avatar-img">
+        </div>
+        <div class="cube-face back"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+      </div>
+      <h1 class="iso-name">{{user_name}}</h1>
+      <p class="iso-bio">{{user_bio}}</p>
+    </section>
+    
+    <section class="link-buildings">
+      {{#each links}}
+      <div class="building-link" data-url="{{url}}">
+        <div class="building-structure">
+          <div class="building-top">
+            <div class="building-icon">{{icon}}</div>
+          </div>
+          <div class="building-front">{{title}}</div>
+          <div class="building-side"></div>
+          <div class="building-shadow"></div>
+        </div>
+        <div class="building-glow"></div>
+      </div>
+      {{/each}}
+    </section>
+    
+    <section class="social-monuments">
+      <div class="monuments-grid">
+        {{#each social_links}}
+        <a href="{{url}}" class="monument">
+          <div class="monument-structure">
+            <div class="monument-top">{{icon}}</div>
+            <div class="monument-pillar"></div>
+            <div class="monument-base"></div>
+          </div>
+        </a>
+        {{/each}}
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+.isometric-template {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #87ceeb 0%, #98d8e8 30%, #b8e6b8 70%, #90ee90 100%);
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+/* 3D World Background */
+.world-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-island {
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: island-float 8s ease-in-out infinite;
+}
+
+.island-1 {
+  top: 10%;
+  left: 15%;
+  animation-delay: 0s;
+}
+
+.island-2 {
+  top: 30%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+.island-3 {
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+@keyframes island-float {
+  0%, 100% { transform: translateY(0px) rotateX(60deg) rotateY(-10deg); }
+  50% { transform: translateY(-15px) rotateX(60deg) rotateY(-10deg); }
+}
+
+.island-base {
+  width: 80px;
+  height: 40px;
+  background: #8b4513;
+  transform: rotateX(60deg);
+  border-radius: 40px;
+  position: relative;
+}
+
+.island-base::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 5px;
+  right: 5px;
+  height: 8px;
+  background: #228b22;
+  border-radius: 35px;
+}
+
+.island-decoration {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tree {
+  width: 8px;
+  height: 15px;
+  background: #8b4513;
+  border-radius: 4px;
+}
+
+.tree::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: #228b22;
+  border-radius: 50%;
+}
+
+.crystal {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 20px solid #87ceeb;
+  position: relative;
+}
+
+.crystal::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid #4682b4;
+}
+
+.building {
+  width: 12px;
+  height: 18px;
+  background: linear-gradient(45deg, #ddd 50%, #bbb 50%);
+  position: relative;
+}
+
+.building::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  right: 1px;
+  height: 3px;
+  background: #999;
+}
+
+/* Floating clouds */
+.cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 25px;
+  opacity: 0.7;
+  animation: cloud-drift 25s linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+
+.cloud-1 {
+  width: 50px;
+  height: 20px;
+  top: 15%;
+  left: -60px;
+  animation-delay: 0s;
+}
+
+.cloud-1::before {
+  width: 20px;
+  height: 20px;
+  top: -10px;
+  left: 10px;
+}
+
+.cloud-1::after {
+  width: 30px;
+  height: 30px;
+  top: -15px;
+  right: 5px;
+}
+
+.cloud-2 {
+  width: 70px;
+  height: 25px;
+  top: 40%;
+  left: -80px;
+  animation-delay: 8s;
+}
+
+.cloud-2::before {
+  width: 25px;
+  height: 25px;
+  top: -12px;
+  left: 15px;
+}
+
+.cloud-2::after {
+  width: 35px;
+  height: 35px;
+  top: -18px;
+  right: 8px;
+}
+
+.cloud-3 {
+  width: 40px;
+  height: 18px;
+  top: 70%;
+  left: -50px;
+  animation-delay: 16s;
+}
+
+.cloud-3::before {
+  width: 18px;
+  height: 18px;
+  top: -9px;
+  left: 8px;
+}
+
+.cloud-3::after {
+  width: 25px;
+  height: 25px;
+  top: -12px;
+  right: 3px;
+}
+
+@keyframes cloud-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(100vw + 100px)); }
+}
+
+/* Main platform */
+.main-platform {
+  position: relative;
+  z-index: 10;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  transform-style: preserve-3d;
+}
+
+/* Character profile with 3D cube avatar */
+.character-profile {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.avatar-cube {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+  transform-style: preserve-3d;
+  animation: cube-rotate 12s linear infinite;
+}
+
+@keyframes cube-rotate {
+  0% { transform: rotateX(15deg) rotateY(0deg); }
+  100% { transform: rotateX(15deg) rotateY(360deg); }
+}
+
+.cube-face {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+}
+
+.cube-face.front {
+  transform: translateZ(60px);
+}
+
+.cube-face.back {
+  transform: rotateY(180deg) translateZ(60px);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.cube-face.right {
+  transform: rotateY(90deg) translateZ(60px);
+  background: linear-gradient(135deg, #764ba2, #f093fb);
+}
+
+.cube-face.left {
+  transform: rotateY(-90deg) translateZ(60px);
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.cube-face.top {
+  transform: rotateX(90deg) translateZ(60px);
+  background: linear-gradient(135deg, #f5576c, #4facfe);
+}
+
+.cube-face.bottom {
+  transform: rotateX(-90deg) translateZ(60px);
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.iso-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  transform: perspective(300px) rotateX(15deg);
+}
+
+.iso-bio {
+  font-size: 1.2rem;
+  color: #4a5568;
+  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+  transform: perspective(300px) rotateX(10deg);
+}
+
+/* 3D Building links */
+.link-buildings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+  perspective: 1000px;
+}
+
+.building-link {
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.building-link:hover {
+  transform: translateY(-10px) rotateY(5deg);
+}
+
+.building-structure {
+  position: relative;
+  transform-style: preserve-3d;
+  width: 120px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.building-top {
+  position: absolute;
+  width: 120px;
+  height: 30px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transform: rotateX(90deg) translateZ(15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.building-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.building-front {
+  position: absolute;
+  width: 120px;
+  height: 70px;
+  background: linear-gradient(180deg, #f8f9fa, #e9ecef);
+  transform: translateZ(15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2d3748;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 0 0 4px 4px;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.building-side {
+  position: absolute;
+  width: 30px;
+  height: 70px;
+  background: linear-gradient(90deg, #dee2e6, #ced4da);
+  transform: rotateY(90deg) translateZ(105px);
+  border-radius: 0 4px 4px 0;
+}
+
+.building-shadow {
+  position: absolute;
+  width: 120px;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.2);
+  transform: rotateX(90deg) translateZ(-35px);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+.building-glow {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+  z-index: -1;
+  filter: blur(10px);
+}
+
+.building-link:hover .building-glow {
+  opacity: 1;
+}
+
+/* Social monuments */
+.social-monuments {
+  text-align: center;
+}
+
+.monuments-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.monument {
+  text-decoration: none;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
+}
+
+.monument:hover {
+  transform: translateY(-5px) rotateY(10deg);
+}
+
+.monument-structure {
+  position: relative;
+  transform-style: preserve-3d;
+  width: 60px;
+  height: 80px;
+}
+
+.monument-top {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  transform: translateZ(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.monument-pillar {
+  position: absolute;
+  width: 20px;
+  height: 40px;
+  background: linear-gradient(90deg, #e9ecef, #ced4da);
+  left: 50%;
+  top: 60px;
+  transform: translateX(-50%);
+  border-radius: 0 0 4px 4px;
+}
+
+.monument-base {
+  position: absolute;
+  width: 40px;
+  height: 8px;
+  background: #adb5bd;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+</style>
+
+<script>
+document.querySelectorAll('.building-link').forEach(building => {
+  building.addEventListener('click', function() {
+    const url = this.dataset.url;
+    if (url) {
+      // 3D click animation
+      this.style.transform = 'translateY(-15px) rotateY(10deg) scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = 'translateY(-10px) rotateY(5deg) scale(1)';
+        window.open(url, '_blank');
+      }, 200);
+    }
+  });
+  
+  // Add mouse movement parallax effect
+  building.addEventListener('mousemove', function(e) {
+    const rect = this.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = (e.clientX - centerX) / 10;
+    const deltaY = (e.clientY - centerY) / 10;
+    
+    this.style.transform = `translateY(-10px) rotateY(${deltaX / 5}deg) rotateX(${-deltaY / 5}deg)`;
+  });
+  
+  building.addEventListener('mouseleave', function() {
+    this.style.transform = 'translateY(0px) rotateY(0deg) rotateX(0deg)';
+  });
+});
+</script>

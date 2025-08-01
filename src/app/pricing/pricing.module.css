@@ -1,0 +1,167 @@
+.pricingContainer {
+  padding: 4rem 2rem;
+  background-color: #f9fafb;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 4rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .pricingGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pricingCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pricingCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.creatorPlan {
+  border: 2px solid #6366f1;
+}
+
+.popularBadge {
+  position: absolute;
+  top: 1.5rem;
+  right: -45px;
+  background-color: #6366f1;
+  color: white;
+  padding: 0.25rem 3rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  transform: rotate(45deg);
+  white-space: nowrap;
+}
+
+.planName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.planPrice {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.planPrice span {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #6b7280;
+}
+
+.planDescription {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  min-height: 40px;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #4b5563;
+}
+
+.featureIcon {
+  color: #34d399;
+  margin-right: 0.75rem;
+  width: 20px;
+  height: 20px;
+}
+
+.ctaButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.freeButton {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.freeButton:hover {
+  background-color: #d1d5db;
+}
+
+.proButton {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.proButton:hover {
+  background-color: #2563eb;
+}
+
+.creatorButton {
+  background-color: #6366f1;
+  color: white;
+}
+
+.creatorButton:hover {
+  background-color: #38429b;
+}
+
+.fadeIn {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.fadeIn.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

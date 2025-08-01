@@ -1,0 +1,26 @@
+/* Component-specific styles */
+
+.link-card {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.link-card:hover {
+  @apply transform scale-105 shadow-lg;
+}
+
+.theme-preview {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.theme-preview:hover {
+  @apply transform scale-105;
+}
+
+.mobile-frame {
+  @apply relative mx-auto;
+  box-shadow: 0 0 0 2px #1f2937, 0 0 0 6px #374151, 0 0 0 8px #1f2937;
+}
+
+.preview-container {
+  @apply bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800;
+} 

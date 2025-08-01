@@ -1,0 +1,190 @@
+<div class="luxury-template">
+  <div class="content-wrapper">
+    <header class="profile-header">
+      <div class="avatar-wrapper">
+        <img src="{{avatar_url}}" alt="{{user_name}}" class="profile-avatar">
+      </div>
+      <h1 class="profile-name">{{user_name}}</h1>
+      <p class="profile-tagline">{{user_bio}}</p>
+    </header>
+    
+    <main class="links-section">
+      {{#each links}}
+      <a href="{{url}}" class="luxury-link" target="_blank">
+        <div class="link-wrapper">
+          <span class="link-label">{{title}}</span>
+          <div class="link-decoration"></div>
+        </div>
+      </a>
+      {{/each}}
+    </main>
+    
+    <footer class="social-section">
+      <div class="social-divider"></div>
+      <div class="social-icons">
+        {{#each social_links}}
+        <a href="{{url}}" class="social-link">{{icon}}</a>
+        {{/each}}
+      </div>
+    </footer>
+  </div>
+</div>
+
+<style>
+.luxury-template {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+  font-family: 'Playfair Display', serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.content-wrapper {
+  max-width: 420px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  padding: 4rem 3rem;
+  position: relative;
+}
+
+.content-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #d4af37, #f4e4bc);
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.avatar-wrapper {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f8f8f8;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.profile-name {
+  font-size: 2.25rem;
+  font-weight: 400;
+  color: #2c2c2c;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.5px;
+}
+
+.profile-tagline {
+  color: #666666;
+  font-size: 1.1rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+.links-section {
+  margin-bottom: 3rem;
+}
+
+.luxury-link {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-link:last-child {
+  margin-bottom: 0;
+}
+
+.link-wrapper {
+  padding: 1.75rem 2rem;
+  border: 1px solid #e8e8e8;
+  position: relative;
+  background: #ffffff;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-link:hover .link-wrapper {
+  border-color: #d4af37;
+  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+  transform: translateY(-2px);
+}
+
+.link-label {
+  font-size: 1.1rem;
+  color: #2c2c2c;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.link-decoration {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #d4af37, #f4e4bc);
+  width: 0;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-link:hover .link-decoration {
+  width: 100%;
+}
+
+.social-section {
+  text-align: center;
+}
+
+.social-divider {
+  width: 80px;
+  height: 1px;
+  background: #e8e8e8;
+  margin: 0 auto 2rem auto;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #f8f8f8;
+  color: #666666;
+  text-decoration: none;
+  font-size: 1.25rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: #d4af37;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+}
+</style>

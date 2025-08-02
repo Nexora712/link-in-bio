@@ -4,6 +4,7 @@ import './globals.css'
 import { AuthProvider } from "@/context/AuthContext";
 // Dynamically import Chatbot so it does not bloat the main bundle
 import dynamic from 'next/dynamic'
+import { Providers } from './providers'
 const Chatbot = dynamic(() => import('@/components/common/chatbot'), { ssr: false })
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         {/* Core meta */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -73,9 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://openrouter.ai" crossOrigin="anonymous" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
-        {/* Chatbot loads after hydration and in a separate chunk */}
-        <Chatbot />
+        <Providers>
+          <AuthProvider>{children}</AuthProvider>
+          {/* Chatbot loads after hydration and in a separate chunk */}
+          <Chatbot />
+        </Providers>
       </body>
     </html>
   )

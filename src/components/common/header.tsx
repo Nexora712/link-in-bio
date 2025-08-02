@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 
 export default function Header() {
   const { user } = useAuth();
@@ -31,7 +32,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Link href="/" className="text-xl font-bold">
+            <Link href="/" className="text-xl font-bold text-foreground">
               LinkNest
             </Link>
           </div>
@@ -42,11 +43,12 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {link.label}
               </Link>
             ))}
+            <ThemeToggle />
           </nav>
 
           {/* Auth Buttons */}
@@ -55,13 +57,13 @@ export default function Header() {
               <>
                 <Link
                   href="/dashboard"
-                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground"
                 >
                   My Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900"
+                  className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                 >
                   Logout
                 </button>
@@ -70,13 +72,13 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                 >
                   Start for Free
                 </Link>
@@ -86,7 +88,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? (
                 <X className="w-6 h-6" />
               ) : (
@@ -104,19 +106,23 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
-            <div className="mt-4 pt-4 border-t">
+            <div className="mt-4 pt-4 border-t space-y-4">
+              <div className="flex">
+                <ThemeToggle />
+              </div>
+
               {user ? (
                 <div className="flex flex-col space-y-4">
                   <Link
                     href="/dashboard"
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                    className="text-sm font-medium text-foreground/80 hover:text-foreground"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Dashboard
@@ -126,7 +132,7 @@ export default function Header() {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md hover:bg-gray-900"
+                    className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                   >
                     Logout
                   </button>
@@ -135,14 +141,14 @@ export default function Header() {
                 <div className="flex flex-col space-y-4">
                   <Link
                     href="/login"
-                    className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                    className="text-sm font-medium text-foreground/80 hover:text-foreground"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/signup"
-                    className="w-full text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    className="w-full text-center px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Start for Free

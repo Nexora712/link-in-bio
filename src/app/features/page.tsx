@@ -36,14 +36,14 @@ const FeaturesPageContent = () => {
   }, []);
 
   return (
-        <div className="bg-gray-50">
+        <div className="bg-background">
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Why LinkNest? Everything You Need to Convert Clicks.
             </h2>
-            <p className="text-xl text-gray-600 mb-12">
+            <p className="text-xl text-muted-foreground mb-12">
               A powerful suite of tools designed to help you grow your audience and business.
             </p>
           </div>
@@ -53,10 +53,10 @@ const FeaturesPageContent = () => {
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="feature-card bg-white rounded-2xl shadow-lg p-8 text-center transition-all duration-500 hover:scale-105">
-                  <i className={`${feature.icon} text-4xl text-blue-600 mb-4`}></i>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                <div key={index} className="feature-card bg-card border rounded-2xl shadow-sm p-8 text-center transition-all duration-500 hover:scale-105">
+                  <i className={`${feature.icon} text-4xl text-primary mb-4`}></i>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
                 </div>
               ))}
             </div>

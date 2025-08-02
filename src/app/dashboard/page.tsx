@@ -1,50 +1,33 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import Link from 'next/link';
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { MetricCards } from "@/components/dashboard/metric-cards";
+import { ActivityFeed } from "@/components/dashboard/activity-feed";
+import { ThemeChart } from "@/components/dashboard/theme-chart";
+import { RecentLinks } from "@/components/dashboard/recent-links";
 
-const DashboardPage = () => {
-  const { user } = useAuth();
-  const [userPlan, setUserPlan] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserPlan = async () => {
-      if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUserPlan(userDoc.data().plan);
-        }
-      }
-      setLoading(false);
-    };
-
-    fetchUserPlan();
-  }, [user]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-3xl font-bold mb-4">My Dashboard</h1>
-          <p className="text-lg mb-2">Welcome, {user?.email}!</p>
-          <p className="text-lg mb-6">Your current plan: <span className="font-semibold capitalize">{userPlan || 'Free'}</span></p>
-          <Link href="/pricing" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-            Upgrade Plan
-          </Link>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back! Here's an overview of your link-in-bio performance.
+          </p>
         </div>
+
+        <MetricCards />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ThemeChart />
+          </div>
+          <ActivityFeed />
+        </div>
+
+        <RecentLinks />
       </div>
     </ProtectedRoute>
   );
-};
-
-export default DashboardPage;
+}

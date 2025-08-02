@@ -35,23 +35,22 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+      <header className="relative overflow-hidden border-b bg-background">
         <div className="relative container mx-auto px-4 py-8">
-          <nav className="flex items-center justify-between mb-16">
+          <nav className="flex items-center justify-between mb-12">
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">LinkNest</span>
+              <Sparkles className="w-8 h-8 text-primary" />
+              <span className="text-2xl font-bold text-foreground">LinkNest</span>
             </div>
-            <div className="hidden sm:flex items-center space-x-4">
-              <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+            <div className="hidden sm:flex items-center space-x-3">
+              <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
                 Pricing
               </Link>
               <Link
                 href="/builder"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Get Started
               </Link>

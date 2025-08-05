@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { ThemeToggle } from "@/components/common/theme-toggle";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Header() {
   const { user } = useAuth();

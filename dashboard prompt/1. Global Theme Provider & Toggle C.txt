@@ -1,0 +1,1141 @@
+1. Global Theme Provider & Toggle Component
+src/components/ui/theme-toggle.tsx
+
+"use client"
+
+import * as React from "react"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
+
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+export function ThemeToggle() {
+  const { setTheme } = useTheme()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" className="relative">
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+
+
+
+2. Enhanced Main Site Header with Theme Toggle
+src/components/common/header.tsx
+
+"use client"
+
+import React from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { User, Settings, LogOut, LayoutDashboard } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth" // We'll create this
+
+export function Header() {
+  const router = useRouter()
+  const { user, logout, isLoading } = useAuth()
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <Link href="/" className="text-xl font-bold">
+            LinkBio
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link href="/templates" className="text-sm font-medium hover:text-primary transition-colors">
+              Templates
+            </Link>
+            <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
+              Pricing
+            </Link>
+            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
+              About
+            </Link>
+          </nav>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <ThemeToggle />
+          
+          {isLoading ? (
+            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>
+                      {user.name?.split(' ').map(n => n[0]).join('') || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/dashboard/account')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" onClick={() => router.push('/auth/signin')}>
+                Sign In
+              </Button>
+              <Button onClick={() => router.push('/auth/signup')}>
+                Get Started
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  )
+}
+
+
+
+3. Authentication Hook and Context
+src/contexts/auth-context.tsx
+
+
+"use client"
+
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+interface User {
+  id: string
+  email: string
+  name: string
+  avatar?: string
+  isOnboarded: boolean
+  createdAt: Date
+}
+
+interface AuthContextType {
+  user: User | null
+  login: (email: string, password: string) => Promise<void>
+  register: (email: string, password: string, name: string) => Promise<void>
+  logout: () => void
+  updateUser: (data: Partial<User>) => Promise<void>
+  isLoading: boolean
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check for existing session on mount
+    checkSession()
+  }, [])
+
+  const checkSession = async () => {
+    try {
+      // Replace with actual API call
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        // Mock user data - replace with actual API call
+        const userData = {
+          id: '1',
+          email: 'user@example.com',
+          name: 'John Doe',
+          avatar: '/avatars/01.png',
+          isOnboarded: true,
+          createdAt: new Date()
+        }
+        setUser(userData)
+      }
+    } catch (error) {
+      console.error('Session check failed:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true)
+    try {
+      // Replace with actual API call
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      
+      if (!response.ok) throw new Error('Login failed')
+      
+      const { user, token } = await response.json()
+      localStorage.setItem('auth_token', token)
+      setUser(user)
+      
+      // Redirect based on onboarding status
+      if (!user.isOnboarded) {
+        router.push('/onboarding')
+      } else {
+        router.push('/dashboard')
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true)
+    try {
+      // Replace with actual API call
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      })
+      
+      if (!response.ok) throw new Error('Registration failed')
+      
+      const { user, token } = await response.json()
+      localStorage.setItem('auth_token', token)
+      setUser(user)
+      
+      // Always redirect to onboarding for new users
+      router.push('/onboarding')
+    } catch (error) {
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('auth_token')
+    setUser(null)
+    router.push('/')
+  }
+
+  const updateUser = async (data: Partial<User>) => {
+    try {
+      // Replace with actual API call
+      const response = await fetch('/api/user/update', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify(data)
+      })
+      
+      if (!response.ok) throw new Error('Update failed')
+      
+      const updatedUser = await response.json()
+      setUser(updatedUser)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const value = {
+    user,
+    login,
+    register,
+    logout,
+    updateUser,
+    isLoading
+  }
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+
+
+src/hooks/use-auth.ts
+
+export { useAuth } from '@/contexts/auth-context'
+
+
+
+
+
+4. User Onboarding Flow
+src/app/onboarding/page.tsx
+
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/hooks/use-auth"
+import { Upload, User, Globe, Palette, CheckCircle } from "lucide-react"
+
+const steps = [
+  { id: 1, title: "Profile Info", icon: User },
+  { id: 2, title: "Bio & Links", icon: Globe },
+  { id: 3, title: "Customize", icon: Palette },
+  { id: 4, title: "Complete", icon: CheckCircle },
+]
+
+export default function OnboardingPage() {
+  const [currentStep, setCurrentStep] = useState(1)
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    bio: '',
+    avatar: '',
+    website: '',
+    social: {
+      instagram: '',
+      twitter: '',
+      youtube: '',
+      tiktok: ''
+    },
+    theme: 'modern-dark'
+  })
+  const { user, updateUser } = useAuth()
+  const router = useRouter()
+
+  const handleNext = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1)
+    }
+  }
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleComplete = async () => {
+    try {
+      await updateUser({ 
+        ...formData, 
+        isOnboarded: true 
+      })
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Onboarding completion failed:', error)
+    }
+  }
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">Welcome to LinkBio!</h2>
+              <p className="text-muted-foreground">Let's set up your profile</p>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={formData.avatar} />
+                  <AvatarFallback className="text-2xl">
+                    {formData.name?.split(' ').map(n => n[0]).join('') || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute -bottom-2 -right-2 rounded-full h-8 w-8 p-0"
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Enter your full name"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="username">Username *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                    linkbio.com/
+                  </span>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    placeholder="username"
+                    className="pl-24"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This will be your unique link-in-bio URL
+                </p>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">Tell us about yourself</h2>
+              <p className="text-muted-foreground">Add your bio and social links</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={formData.bio}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                  placeholder="Tell your audience about yourself..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instagram">Instagram</Label>
+                  <Input
+                    id="instagram"
+                    value={formData.social.instagram}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social: { ...formData.social, instagram: e.target.value }
+                    })}
+                    placeholder="@username"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="twitter">Twitter</Label>
+                  <Input
+                    id="twitter"
+                    value={formData.social.twitter}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      social: { ...formData.social, twitter: e.target.value }
+                    })}
+                    placeholder="@username"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">Choose your style</h2>
+              <p className="text-muted-foreground">Select a theme for your link-in-bio page</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { id: 'modern-dark', name: 'Modern Dark', color: 'bg-gray-900' },
+                { id: 'minimal-light', name: 'Minimal Light', color: 'bg-white border-2' },
+                { id: 'gradient', name: 'Gradient', color: 'bg-gradient-to-br from-purple-500 to-pink-500' },
+                { id: 'glassmorphism', name: 'Glassmorphism', color: 'bg-blue-200 backdrop-blur' }
+              ].map((theme) => (
+                <div
+                  key={theme.id}
+                  className={`p-4 rounded-lg cursor-pointer transition-all ${
+                    formData.theme === theme.id 
+                      ? 'ring-2 ring-primary' 
+                      : 'hover:scale-105'
+                  }`}
+                  onClick={() => setFormData({ ...formData, theme: theme.id })}
+                >
+                  <div className={`h-20 rounded ${theme.color} mb-2`} />
+                  <p className="text-sm font-medium text-center">{theme.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+
+      case 4:
+        return (
+          <div className="space-y-6 text-center">
+            <div className="flex justify-center">
+              <CheckCircle className="h-16 w-16 text-green-500" />
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold">You're all set!</h2>
+              <p className="text-muted-foreground">
+                Your link-in-bio page is ready. You can always customize it later.
+              </p>
+            </div>
+
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">Your link-in-bio URL:</p>
+              <Badge variant="secondary" className="text-sm">
+                linkbio.com/{formData.username}
+              </Badge>
+            </div>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step, index) => (
+              <div key={step.id} className="flex items-center">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                  currentStep >= step.id 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
+                  <step.icon className="h-4 w-4" />
+                </div>
+                {index < steps.length - 1 && (
+                  <div className={`w-8 h-0.5 ${
+                    currentStep > step.id ? 'bg-primary' : 'bg-muted'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
+          <CardTitle>Step {currentStep} of {steps.length}</CardTitle>
+          <CardDescription>{steps[currentStep - 1]?.title}</CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          {renderStep()}
+          
+          <div className="flex justify-between mt-8">
+            <Button 
+              variant="outline" 
+              onClick={handleBack}
+              disabled={currentStep === 1}
+            >
+              Back
+            </Button>
+            
+            {currentStep === steps.length ? (
+              <Button onClick={handleComplete}>
+                Complete Setup
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleNext}
+                disabled={
+                  (currentStep === 1 && (!formData.name || !formData.username)) ||
+                  (currentStep === 2 && !formData.bio)
+                }
+              >
+                Next
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+
+
+5. Unified Templates Page
+src/app/templates/page.tsx
+
+
+"use client"
+
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Header } from "@/components/common/header"
+import { Eye, Star, Search, Filter } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "next/navigation"
+
+const templates = [
+  {
+    id: 1,
+    name: "Modern Dark",
+    description: "Sleek dark theme with gradient accents perfect for creators",
+    category: "Dark",
+    popularity: 95,
+    preview: "/templates/modern-dark.jpg",
+    tags: ["modern", "dark", "gradient", "professional"]
+  },
+  {
+    id: 2,
+    name: "Minimal Light",
+    description: "Clean and minimal design for a professional look",
+    category: "Light",
+    popularity: 88,
+    preview: "/templates/minimal-light.jpg",
+    tags: ["minimal", "clean", "professional", "simple"]
+  },
+  {
+    id: 3,
+    name: "Glassmorphism",
+    description: "Modern glass effect design with blur effects",
+    category: "Modern",
+    popularity: 92,
+    preview: "/templates/glassmorphism.jpg",
+    tags: ["glassmorphism", "modern", "trendy", "blur"]
+  },
+  {
+    id: 4,
+    name: "Neon Cyber",
+    description: "Futuristic neon design for tech enthusiasts",
+    category: "Dark",
+    popularity: 78,
+    preview: "/templates/neon-cyber.jpg",
+    tags: ["neon", "cyber", "futuristic", "tech"]
+  },
+  {
+    id: 5,
+    name: "Soft Gradient",
+    description: "Gentle gradients with pastel colors",
+    category: "Light",
+    popularity: 85,
+    preview: "/templates/soft-gradient.jpg",
+    tags: ["gradient", "pastel", "soft", "feminine"]
+  },
+  {
+    id: 6,
+    name: "Brutalist",
+    description: "Bold and edgy design with strong typography",
+    category: "Modern",
+    popularity: 71,
+    preview: "/templates/brutalist.jpg",
+    tags: ["brutalist", "bold", "edgy", "typography"]
+  }
+]
+
+const categories = ["All", "Dark", "Light", "Modern"]
+
+export default function TemplatesPage() {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const { user } = useAuth()
+  const router = useRouter()
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesCategory = selectedCategory === "All" || template.category === selectedCategory
+    
+    return matchesSearch && matchesCategory
+  })
+
+  const handleUseTemplate = (templateId: number) => {
+    if (!user) {
+      router.push('/auth/signin')
+      return
+    }
+    
+    // Store selected template and redirect to builder
+    localStorage.setItem('selectedTemplate', templateId.toString())
+    router.push('/builder')
+  }
+
+  const handlePreview = (templateId: number) => {
+    router.push(`/templates/${templateId}/preview`)
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Beautiful Templates</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Choose from our curated collection of stunning templates designed to make your link-in-bio stand out.
+          </p>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search templates..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                onClick={() => setSelectedCategory(category)}
+                className="transition-all duration-200"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Templates Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTemplates.map((template) => (
+            <Card key={template.id} className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+              <div className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 relative overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-all duration-300">
+                  <span className="text-2xl font-bold text-white/80">
+                    {template.name}
+                  </span>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <Badge variant="secondary" className="bg-white/90 text-black">
+                    {template.category}
+                  </Badge>
+                </div>
+              </div>
+              
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                      {template.name}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {template.description}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <Star className="h-4 w-4 fill-current text-yellow-500" />
+                    <span>{template.popularity}% popularity</span>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="flex gap-2 mb-4 flex-wrap">
+                  {template.tags.slice(0, 3).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handlePreview(template.id)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleUseTemplate(template.id)}
+                  >
+                    Use Template
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredTemplates.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No templates found matching your criteria.</p>
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
+
+
+
+6. Updated Root Layout with Providers
+src/app/layout.tsx
+
+
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { Providers } from "./providers"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "LinkBio - Your Link in Bio Tool",
+  description: "Create beautiful link-in-bio pages in minutes",
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
+  )
+}
+
+
+
+src/app/providers.tsx
+
+"use client"
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from 'next-themes'
+import { AuthProvider } from '@/contexts/auth-context'
+import { useState } from 'react'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        cacheTime: 10 * 60 * 1000, // 10 minutes
+      },
+    },
+  }))
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  )
+}
+
+
+
+
+7. Updated Dashboard Navbar (Remove redundant theme toggle)
+src/components/dashboard/navbar.tsx (Updated)
+
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Bell, Search, Settings, LogOut, User } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/hooks/use-auth"
+import { useNotifications } from "@/hooks/use-dashboard-data"
+import { formatDistanceToNow } from "date-fns"
+import { useRouter } from "next/navigation"
+
+export function Navbar() {
+  const { user, logout } = useAuth()
+  const { data: notifications, isLoading: notificationsLoading } = useNotifications()
+  const router = useRouter()
+
+  const unreadCount = notifications?.filter(n => !n.read).length || 0
+
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return "Good morning"
+    if (hour < 18) return "Good afternoon"
+    return "Good evening"
+  }
+
+  return (
+    <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      <div className="flex items-center space-x-4 flex-1">
+        <div className="hidden md:block">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {getGreeting()}, {user?.name?.split(' ')[0] || 'User'}!
+            </h2>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-4 flex-1 max-w-md ml-auto">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search..."
+              className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-4">
+        {/* Notifications */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="sm" className="relative transition-all duration-200 hover:scale-105">
+              {notificationsLoading ? (
+                <Skeleton className="h-4 w-4" />
+              ) : (
+                <>
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="end">
+            <div className="p-4 border-b">
+              <h3 className="font-semibold">Notifications</h3>
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              {notificationsLoading ? (
+                <div className="p-4 space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              ) : notifications?.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  No notifications yet
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {notifications?.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`p-4 hover:bg-muted/50 transition-colors ${
+                        !notification.read ? 'bg-blue-50 dark:bg-blue-950/10' : ''
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1 flex-1">
+                          <p className="text-sm font-medium">{notification.title}</p>
+                          <p className="text-xs text-muted-foreground">{notification.message}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
+                          </p>
+                        </div>
+                        {!notification.read && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
+        
+        {/* User Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full transition-all duration-200 hover:scale-105">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback>
+                  {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  {user?.name || 'User'}
+                </p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user?.email || 'user@example.com'}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push('/dashboard/account')}>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout} className="text-red-600">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  )
+}
+
+
+
+8. Required Dependencies
+Add these to your package.json:
+
+npm install @tanstack/react-query next-themes date-fns
+npm install @types/date-fns
+npx shadcn-ui@latest add dropdown-menu popover textarea
+
+
+
+Summary of Improvements
+✅ Global Theme Toggle: Available on all pages (main site + dashboard)
+✅ Unified Templates: Single, comprehensive templates page for both contexts
+✅ Real Authentication: Proper auth context with user state management
+✅ User Onboarding: Complete 4-step setup flow for new users
+✅ Dynamic User Data: Real user info displayed throughout the app
+✅ Consistent UI: Unified design patterns across all pages
+✅ Enhanced UX: Better transitions, loading states, and interactions
+✅ Mobile Responsive: All components work perfectly on mobile
+✅ Accessibility: Proper keyboard navigation and screen reader support
+

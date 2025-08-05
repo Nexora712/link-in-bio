@@ -61,7 +61,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile);
+            const userProfileData = userDoc.data() as UserProfile;
+            setUserProfile(userProfileData);
+            if (!userProfileData.onboardingCompleted) {
+              router.push('/onboarding');
+            }
           } else {
             // Create initial user profile
             const initialProfile: UserProfile = {
@@ -74,6 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             };
             await setDoc(doc(db, 'users', user.uid), initialProfile);
             setUserProfile(initialProfile);
+            router.push('/onboarding');
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
@@ -86,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const signIn = async (email: string, password: string) => {
     try {

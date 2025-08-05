@@ -38,6 +38,9 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = () => {
+    if (currentStep === 2 && (!formData.displayName || !formData.username)) {
+      return;
+    }
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -161,6 +164,7 @@ export default function OnboardingPage() {
                           value={formData.displayName}
                           onChange={(e) => handleInputChange('displayName', e.target.value)}
                           placeholder="John Doe"
+                          required
                         />
                       </div>
 
@@ -171,6 +175,7 @@ export default function OnboardingPage() {
                           value={formData.username}
                           onChange={(e) => handleInputChange('username', e.target.value)}
                           placeholder="johndoe"
+                          required
                         />
                       </div>
 

@@ -5,12 +5,14 @@ const configureEnvironment = function () {
     const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
-        throw new Error('PayPal client ID or secret is not set in environment variables.');
+        console.warn('PayPal client ID or secret is not set in environment variables. PayPal functionality will be disabled.');
+        return null;
     }
 
     return new paypal.core.SandboxEnvironment(clientId, clientSecret);
 };
 
-const client = new paypal.core.PayPalHttpClient(configureEnvironment());
+const environment = configureEnvironment();
+const client = environment ? new paypal.core.PayPalHttpClient(environment) : null;
 
 export default client;

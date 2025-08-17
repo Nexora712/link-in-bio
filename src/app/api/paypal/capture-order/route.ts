@@ -3,6 +3,10 @@ import client from '@/lib/paypal';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
+    if (!client) {
+        return new NextResponse('PayPal is not configured', { status: 503 });
+    }
+
     const { orderID } = await req.json();
 
     if (!orderID) {

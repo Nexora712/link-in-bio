@@ -66,12 +66,21 @@ const MetricCard = ({
 }
 
 export function MetricCards() {
-  const { data: stats, isLoading, error } = useUserStats()
+  const { data: stats, isLoading, error, isError } = useUserStats()
 
-  if (error) {
+  console.log('MetricCards render:', { stats, isLoading, error, isError })
+
+  if (isError) {
     return (
-      <div className="text-center p-8">
-        <p className="text-red-500">Failed to load metrics. Please try again.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="col-span-full text-center p-8">
+          <p className="text-red-500 mb-2">Failed to load metrics. Please try again.</p>
+          {error && (
+            <p className="text-sm text-muted-foreground">
+              Error: {error instanceof Error ? error.message : 'Unknown error'}
+            </p>
+          )}
+        </div>
       </div>
     )
   }
@@ -110,7 +119,7 @@ export function MetricCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {metrics.map((metric) => (
-        <MetricCard key={metric.title} {...metric} isLoading={!!isLoading} />
+        <MetricCard key={metric.title} {...metric} isLoading={isLoading} />
       ))}
     </div>
   )

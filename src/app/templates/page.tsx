@@ -115,9 +115,9 @@ export default function TemplatesPage() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "newest":
-          return (b.createdAt || 0) - (a.createdAt || 0);
+          return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0);
         case "oldest":
-          return (a.createdAt || 0) - (b.createdAt || 0);
+          return (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0);
         case "name":
           return a.name.localeCompare(b.name);
         default: // popular

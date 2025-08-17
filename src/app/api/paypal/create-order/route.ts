@@ -3,6 +3,10 @@ import client from '@/lib/paypal';
 import { NextResponse } from 'next/server';
 
 export async function POST() {
+    if (!client) {
+        return new NextResponse('PayPal is not configured', { status: 503 });
+    }
+
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer("return=representation");
     request.requestBody({

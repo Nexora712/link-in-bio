@@ -22,7 +22,7 @@ import { Bell, Search, Settings, LogOut, User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/hooks/use-auth"
 import { useNotifications } from "@/hooks/use-dashboard-data"
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow"
 import { useRouter } from "next/navigation"
 
 export function Navbar() {

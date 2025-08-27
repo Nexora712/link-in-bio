@@ -1,158 +1,261 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useMemo, useDeferredValue } from "react";
-import Link from "next/link";
-import { Smartphone, Monitor } from "lucide-react";
-import Header from "@/components/common/header";
-import dynamic from "next/dynamic";
-import { LinkActions } from "@/components/actions/LinkActions";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useSearchParams } from "next/navigation";
-import type {
-  FormData,
-  LinkItem as LinkType,
-  SocialLink,
-} from "@/components/form/link-form";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import ProtectedRoute from "@/components/ProtectedRoute"
+import { useAuth } from "@/contexts/auth-context"
+import { LinkFormData } from "@/types/link"
+import { motion } from "framer-motion"
 
-// Defer loading of heavy preview to client and split bundle
-const LinkPreview = dynamic(() => import("@/components/preview/link-preview").then(m => m.LinkPreview), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[320px] rounded-xl border flex items-center justify-center text-sm text-gray-500">
-      Loading preview...
-    </div>
-  ),
-});
+// Navbar Component
+import Navbar from "@/components/Navbar"
 
-// Keep form imported normally to allow interaction ASAP
-import { LinkBuilderForm } from "@/components/form/link-form";
+import DownloadButton from "@/components/builder/DownloadButton"
 
-const BuilderPageContent = () => {
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    bio: "",
-    avatar: "",
+// Builder Components  
+import ProfileSection from "@/components/builder/ProfileSection"
+import SocialLinksSection from "@/components/builder/SocialLinksSection"
+import CustomLinksSection from "@/components/builder/CustomLinksSection"
+import TemplateSelector from "@/components/builder/TemplateSelector"
+import PreviewFrame from "@/components/builder/PreviewFrame"
+
+const BuilderPage = () => {
+  const { user } = useAuth()
+  const router = useRouter()
+
+  // Builder State
+  const [formData, setFormData] = useState<LinkFormData>({
+    displayName: '',
+    bio: '',
     profileImage: null,
-  });
-  const [links, setLinks] = useState<LinkType[]>([]);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState("minimal");
-  const [isMobilePreview, setIsMobilePreview] = useState(false);
+    socialLinks: {
+      instagram: '',
+      twitter: '',
+      linkedin: '',
+      youtube: '',
+      tiktok: ''
+    },
+    customLinks: [],
+    template: 'minimal',
+    templateStyles: {
+      background: '#FFFFFF',
+      fontFamily: 'Inter',
+      primaryColor: '#000000',
+      secondaryColor: '#444444',
+      borderRadius: '12px',
+      backgroundImage: null // Add background image support
+    },
+    theme: 'light'
+  })
 
-  const searchParams = useSearchParams();
+  const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
 
-  // Apply theme from query string first, fallback to localStorage
+  // Load user data on mount
   useEffect(() => {
-    const qpTheme = searchParams?.get("theme");
-    if (qpTheme) {
-      setSelectedTheme(qpTheme);
-      try {
-        localStorage.setItem("selected-theme", qpTheme);
-      } catch {}
-      return;
+    if (user) {
+      loadUserData()
     }
+  }, [user])
+
+  // Auto-save functionality
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      handleAutoSave()
+    }, 2000)
+
+    return () => clearTimeout(saveTimeout)
+  }, [formData])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 's':
+            e.preventDefault()
+            handleManualSave()
+            break
+          case 'z':
+            if (!e.shiftKey) {
+              e.preventDefault()
+              // Implement undo functionality
+            }
+            break
+          case 'y':
+            e.preventDefault()
+            // Implement redo functionality
+            break
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  const loadUserData = async () => {
+    setIsLoading(true)
     try {
-      const saved = localStorage.getItem("selected-theme");
-      if (saved) setSelectedTheme(saved);
-    } catch {}
-  }, [searchParams]);
+      console.log('Loading user data...')
+    } catch (error) {
+      console.error('Error loading user data:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-  // Smooth typing latency: defer values passed to preview
-  const deferredFormData = useDeferredValue(formData);
-  const deferredLinks = useDeferredValue(links);
-  const deferredSocial = useDeferredValue(socialLinks);
+  const handleAutoSave = async () => {
+    if (isSaving) return
+    
+    setAutoSaveStatus('saving')
+    try {
+      console.log('Auto-saving data...', formData)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setAutoSaveStatus('saved')
+    } catch (error) {
+      console.error('Error auto-saving:', error)
+      setAutoSaveStatus('error')
+    }
+  }
 
-  // Memoize toggle label
-  const toggleLabel = useMemo(
-    () => (isMobilePreview ? "Mobile" : "Desktop"),
-    [isMobilePreview]
-  );
+  const handleManualSave = async () => {
+    setIsSaving(true)
+    try {
+      console.log('Manually saving data...', formData)
+      await new Promise(resolve => setTimeout(resolve, 1500))
+    } catch (error) {
+      console.error('Error saving:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleTemplateChange = (template: any) => {
+    setFormData(prev => ({
+      ...prev,
+      template: template.id,
+      templateStyles: {
+        ...template.styles,
+        backgroundImage: template.backgroundImage || null
+      }
+    }))
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      <Header />
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Create Your Bio Page
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Real-time preview. Real-time magic.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 max-w-7xl mx-auto">
-          {/* Form Section */}
-          <div className="order-2 xl:order-1">
-            <LinkBuilderForm
-              formData={formData}
-              setFormData={setFormData}
-              links={links}
-              setLinks={setLinks}
-              socialLinks={socialLinks}
-              setSocialLinks={setSocialLinks}
-              onThemeChange={setSelectedTheme}
-            />
-          </div>
+    <ProtectedRoute>
+      <Navbar />
+      <div className="min-h-screen bg-white dark:bg-black">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           
-          {/* Preview Section */}
-          <div className="order-1 xl:order-2">
-            <div className="sticky top-24 space-y-3">
-              {/* View toggle restored */}
-              <div className="flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsMobilePreview(false)}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border text-sm ${!isMobilePreview ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'}`}
-                  aria-pressed={!isMobilePreview}
-                >
-                  <Monitor className="w-4 h-4" />
-                  Desktop
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsMobilePreview(true)}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border text-sm ${isMobilePreview ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'}`}
-                  aria-pressed={isMobilePreview}
-                >
-                  <Smartphone className="w-4 h-4" />
-                  Mobile
-                </button>
-              </div>
+          {/* Header Section */}
+          <div className="text-center mb-16">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl md:text-6xl font-bold text-black dark:text-white mb-4"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Create Your Bio Page
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              Real-time preview. Real-time magic.
+            </motion.p>
 
-              <LinkPreview
-                formData={deferredFormData}
-                links={deferredLinks}
-                socialLinks={deferredSocial}
-                selectedTheme={selectedTheme}
-                isMobilePreview={isMobilePreview}
-              />
+            {/* Download Button */}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.2 }}
+    className="mb-6"
+  >
+    <DownloadButton formData={formData} />
+  </motion.div>
+            
+            {/* Auto-save Status */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6 flex items-center justify-center gap-2"
+            >
+              <div className={`w-2 h-2 rounded-full ${
+                autoSaveStatus === 'saved' ? 'bg-green-500' : 
+                autoSaveStatus === 'saving' ? 'bg-yellow-500 animate-pulse' : 
+                'bg-red-500'
+              }`} />
+              <span 
+                className="text-sm text-gray-500 dark:text-gray-400"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {autoSaveStatus === 'saved' ? 'All changes saved' : 
+                 autoSaveStatus === 'saving' ? 'Saving...' : 
+                 'Error saving changes'}
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-12 gap-8">
+            
+            {/* Left Column: Editor Controls */}
+            <div className="col-span-12 lg:col-span-5 space-y-8">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-8"
+              >
+                <ProfileSection
+                  formData={formData}
+                  setFormData={setFormData}
+                />
+
+                <SocialLinksSection
+                  formData={formData}
+                  setFormData={setFormData}
+                />
+
+                <CustomLinksSection
+                  formData={formData}
+                  setFormData={setFormData}
+                />
+
+                <TemplateSelector
+                  selectedTemplate={formData.template}
+                  onTemplateChange={handleTemplateChange}
+                />
+              </motion.div>
+            </div>
+
+            {/* Right Column: Live Preview */}
+            <div className="col-span-12 lg:col-span-7">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="sticky top-8"
+              >
+                <PreviewFrame
+                  formData={formData}
+                  device={previewDevice}
+                  onDeviceChange={setPreviewDevice}
+                />
+              </motion.div>
             </div>
           </div>
         </div>
-
-        {/* Actions Section */}
-        <div className="mt-12 max-w-4xl mx-auto">
-          <LinkActions
-            formData={formData}
-            links={links}
-            socialLinks={socialLinks}
-            selectedTheme={selectedTheme}
-            onCopySuccess={() => console.log("HTML copied successfully")}
-            onCopyError={(error: any) => console.error("Copy failed:", error)}
-          />
-        </div>
       </div>
-    </div>
-  );
-};
-
-export default function BuilderPage() {
-  return (
-    <ProtectedRoute>
-      <BuilderPageContent />
     </ProtectedRoute>
-  );
+  )
 }
+
+export default BuilderPage

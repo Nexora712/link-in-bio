@@ -428,6 +428,45 @@ export const themeConfigs: Record<string, ThemeConfig> = {
   // DO NOT spread newThemes to prevent eager import. The heavy themes are now referenced via lazy loader helpers.
 };
 
+themeConfigs['minimal-glassmorphism'] = {
+  id: "minimal-glassmorphism",
+  name: "Minimal Glassmorphism",
+  description: "Minimal glassmorphism design",
+  styles: {
+    background: "bg-gradient-to-br from-purple-400 via-pink-500 to-blue-500",
+    container: "bg-white/10 backdrop-blur-md border border-white/20",
+    text: {
+      primary: "text-white font-semibold",
+      secondary: "text-white/80"
+    },
+    button: {
+      primary: "bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm",
+      hover: "hover:scale-105 transition-all duration-300"
+    },
+    avatar: {
+      border: "border-white/30",
+      background: "bg-white/20"
+    }
+  },
+  exportStyles: {
+    background: "linear-gradient(to bottom right, #a855f7, #d946ef, #3b82f6)",
+    text: { primary: "#ffffff", secondary: "#e5e7eb" },
+    button: { primary: "rgba(255, 255, 255, 0.2)" },
+    css: `
+      html, body { margin: 0; min-height: 100vh; }
+      body { font-family: sans-serif; background: linear-gradient(to bottom right, #a855f7, #d946ef, #3b82f6); color: #ffffff; }
+      .container { max-width: 680px; margin: 40px auto; padding: 20px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+      .profile-header { text-align: center; margin-bottom: 40px; }
+      .profile-image { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 3px solid rgba(255,255,255,0.3); }
+      .link { display: block; background-color: rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; margin-bottom: 15px; text-align: center; text-decoration: none; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease; }
+      .link:hover { transform: scale(1.05); }
+      .social-links { text-align: center; margin-top: 20px; }
+      .social-icon { margin: 0 10px; text-decoration: none; color: rgba(255, 255, 255, 0.8); font-size: 24px; }
+    `,
+    mobileCss: ""
+  }
+};
+
 export const getThemeConfig = (themeId: string): ThemeConfig => {
   return themeConfigs[themeId] || themeConfigs.minimal;
 };
@@ -454,6 +493,48 @@ const themeLoaders: Record<string, ThemeLoader> = {
 'creative-portfolio': async () => (await import('./new-themes')).newThemes['creative-portfolio'],
 };
 
+
+themeLoaders['minimal-glassmorphism'] = async () => {
+  // Return the theme config for minimal-glassmorphism
+  return {
+    id: "minimal-glassmorphism",
+    name: "Minimal Glassmorphism",
+    description: "Minimal glassmorphism design",
+    styles: {
+      background: "bg-gradient-to-br from-purple-400 via-pink-500 to-blue-500",
+      container: "bg-white/10 backdrop-blur-md border border-white/20",
+      text: {
+        primary: "text-white font-semibold",
+        secondary: "text-white/80"
+      },
+      button: {
+        primary: "bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm",
+        hover: "hover:scale-105 transition-all duration-300"
+      },
+      avatar: {
+        border: "border-white/30",
+        background: "bg-white/20"
+      }
+    },
+    exportStyles: {
+      background: "linear-gradient(to bottom right, #a855f7, #d946ef, #3b82f6)",
+      text: { primary: "#ffffff", secondary: "#e5e7eb" },
+      button: { primary: "rgba(255, 255, 255, 0.2)" },
+      css: `
+        html, body { margin: 0; min-height: 100vh; }
+        body { font-family: sans-serif; background: linear-gradient(to bottom right, #a855f7, #d946ef, #3b82f6); color: #ffffff; }
+        .container { max-width: 680px; margin: 40px auto; padding: 20px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+        .profile-header { text-align: center; margin-bottom: 40px; }
+        .profile-image { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 3px solid rgba(255,255,255,0.3); }
+        .link { display: block; background-color: rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; margin-bottom: 15px; text-align: center; text-decoration: none; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease; }
+        .link:hover { transform: scale(1.05); }
+        .social-links { text-align: center; margin-top: 20px; }
+        .social-icon { margin: 0 10px; text-decoration: none; color: rgba(255, 255, 255, 0.8); font-size: 24px; }
+      `,
+      mobileCss: ""
+    }
+  };
+};
 
 /**
  * Async getter to fetch a single theme lazily (single declaration).

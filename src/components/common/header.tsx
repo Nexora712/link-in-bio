@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/auth-context";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -44,7 +44,6 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={`Navigate to ${link.label}`}
               >
                 {link.label}
               </Link>
@@ -59,14 +58,12 @@ export default function Header() {
                 <Link
                   href="/dashboard"
                   className="text-sm font-medium text-foreground/80 hover:text-foreground"
-                  aria-label="Go to your dashboard"
                 >
                   My Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                  aria-label="Logout"
                 >
                   Logout
                 </button>
@@ -76,14 +73,12 @@ export default function Header() {
                 <Link
                   href="/login"
                   className="text-sm font-medium text-foreground/80 hover:text-foreground"
-                  aria-label="Login to your account"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
                   className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                  aria-label="Sign up for a new account"
                 >
                   Start for Free
                 </Link>
@@ -113,7 +108,6 @@ export default function Header() {
                   href={link.href}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setIsMenuOpen(false)}
-                  aria-label={`Navigate to ${link.label}`}
                 >
                   {link.label}
                 </Link>
@@ -130,7 +124,6 @@ export default function Header() {
                     href="/dashboard"
                     className="text-sm font-medium text-foreground/80 hover:text-foreground"
                     onClick={() => setIsMenuOpen(false)}
-                    aria-label="Go to your dashboard"
                   >
                     My Dashboard
                   </Link>
@@ -140,7 +133,6 @@ export default function Header() {
                       setIsMenuOpen(false);
                     }}
                     className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                    aria-label="Logout"
                   >
                     Logout
                   </button>
@@ -151,7 +143,6 @@ export default function Header() {
                     href="/login"
                     className="text-sm font-medium text-foreground/80 hover:text-foreground"
                     onClick={() => setIsMenuOpen(false)}
-                    aria-label="Login to your account"
                   >
                     Login
                   </Link>
@@ -159,7 +150,6 @@ export default function Header() {
                     href="/signup"
                     className="w-full text-center px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                     onClick={() => setIsMenuOpen(false)}
-                    aria-label="Sign up for a new account"
                   >
                     Start for Free
                   </Link>

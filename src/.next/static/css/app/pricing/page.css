@@ -1,0 +1,171 @@
+/*!******************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[7].use[3]!./src/app/pricing/pricing.module.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************/
+.pricing_pricingContainer__URDqT {
+  padding: 4rem 2rem;
+  background-color: #f9fafb;
+}
+
+.pricing_title__waPcj {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.pricing_subtitle__CkmJp {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 4rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pricing_pricingGrid__oGRL1 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .pricing_pricingGrid__oGRL1 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pricing_pricingCard__d1bau {
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pricing_pricingCard__d1bau:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.pricing_creatorPlan__pjCuP {
+  border: 2px solid #6366f1;
+}
+
+.pricing_popularBadge__BBQxs {
+  position: absolute;
+  top: 1.5rem;
+  right: -45px;
+  background-color: #6366f1;
+  color: white;
+  padding: 0.25rem 3rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  transform: rotate(45deg);
+  white-space: nowrap;
+}
+
+.pricing_planName__tERji {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.pricing_planPrice__g9Hns {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.pricing_planPrice__g9Hns span {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #6b7280;
+}
+
+.pricing_planDescription__Y2i3g {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  min-height: 40px;
+}
+
+.pricing_featureList__lm3nR {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.pricing_featureItem__MU7SU {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #4b5563;
+}
+
+.pricing_featureIcon__dyr8h {
+  color: #34d399;
+  margin-right: 0.75rem;
+  width: 20px;
+  height: 20px;
+}
+
+.pricing_ctaButton__BkIdF {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.pricing_freeButton__u0vl0 {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.pricing_freeButton__u0vl0:hover {
+  background-color: #d1d5db;
+}
+
+.pricing_proButton__xFrpZ {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.pricing_proButton__xFrpZ:hover {
+  background-color: #2563eb;
+}
+
+.pricing_creatorButton__uQu1p {
+  background-color: #6366f1;
+  color: white;
+}
+
+.pricing_creatorButton__uQu1p:hover {
+  background-color: #38429b;
+}
+
+.pricing_fadeIn__jBuXi {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.pricing_fadeIn__jBuXi.pricing_visible___5iXi {
+  opacity: 1;
+  transform: translateY(0);
+}
+

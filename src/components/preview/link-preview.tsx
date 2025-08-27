@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Smartphone, Monitor } from "lucide-react";
 import type { FormData, LinkItem, SocialLink } from "@/components/form/link-form";
 import type { ThemeConfig } from '@/lib/themes/theme-mappings';
+import { useAuth } from "@/contexts/auth-context";
+import { trackLinkClick } from "@/lib/performance-utils";
 
 interface LinkPreviewProps {
   formData: FormData;
@@ -24,8 +26,7 @@ function LinkPreviewInner({
   isMobilePreview = false
 }: LinkPreviewProps) {
   const [theme, setTheme] = useState<ThemeConfig | null>(null);
-  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-
+  
   // Resolve theme config on client after on-demand import (use async helper if available)
   useEffect(() => {
     let mounted = true;
@@ -43,21 +44,22 @@ function LinkPreviewInner({
     return () => { mounted = false; };
   }, [selectedTheme]);
 
-  useEffect(() => {
-    if (formData.profileImage) {
-      const url = URL.createObjectURL(formData.profileImage);
-      setProfileImageUrl(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setProfileImageUrl(null);
+  // Fix: Use useMemo for profileImageUrl (remove the useState declaration)
+  const profileImageUrl = useMemo(() => {
+    if (formData?.profileImage instanceof File) {
+      return URL.createObjectURL(formData.profileImage);
     }
-  }, [formData.profileImage]);
+    return formData?.profileImage || null;
+  }, [formData?.profileImage]);
 
-  const activeSocial = useMemo(() => socialLinks.filter(l => l.isActive), [socialLinks]);
+  const activeSocial = useMemo(() => socialLinks?.filter(l => l?.isActive) || [], [socialLinks]);
+  
   const safeLinks = useMemo(
-    () => links.map((l, i) => ({ ...l, key: l.id ?? `k-${i}` })),
+    () => links?.map((l, i) => ({ ...l, key: l?.id ?? `k-${i}` })) || [],
     [links]
   );
+
+  const { user } = useAuth();
 
   if (!theme) {
     return (
@@ -120,14 +122,14 @@ function LinkPreviewInner({
                     ${theme.styles.avatar.background} ${theme.styles.text.primary}
                     ${isMobilePreview ? 'text-lg' : 'text-xl'}
                   `}>
-                    {formData.name?.charAt(0) || "U"}
+                    {formData?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <h2 className={`${isMobilePreview ? 'text-lg' : 'text-xl'} mb-2 ${theme.styles.text.primary}`}>
-                  {formData.name || "Your Name"}
+                  {formData?.name || "Your Name"}
                 </h2>
                 <p className={`text-sm mb-6 leading-relaxed ${theme.styles.text.secondary} ${isMobilePreview ? 'text-xs' : ''}`}>
-                  {formData.bio || "Short bio goes here"}
+                  {formData?.bio || "Short bio goes here"}
                 </p>
               </div>
 
@@ -142,6 +144,11 @@ function LinkPreviewInner({
                       ${theme.styles.button.hover}
                     `}
                     asChild
+                    onClick={() => {
+                      if (user) {
+                        trackLinkClick(user.uid);
+                      }
+                    }}
                   >
                     <a href={link.url || '#'} target="_blank" rel="noopener noreferrer">
                       <span className="font-medium">

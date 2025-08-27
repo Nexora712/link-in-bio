@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState, useCallback } from "react";
+import { memo, useMemo, useState, useCallback, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -69,7 +69,7 @@ export function ThemeSelector({
   const [themes, setThemes] = useState<Pick<ThemeConfig, 'id' | 'name' | 'description' | 'styles'>[] | null>(null);
 
   // Load themes metadata on mount without blocking TTI
-  useMemo(() => {
+  useEffect(() => {
     // Fire and forget
     loadThemeList().then(setThemes).catch(() => {
       // noop: keep null, UI still works with radio value state

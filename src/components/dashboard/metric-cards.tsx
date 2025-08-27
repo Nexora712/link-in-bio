@@ -68,10 +68,18 @@ const MetricCard = ({
 export function MetricCards() {
   const { data: stats, isLoading, error } = useUserStats()
 
-  if (error) {
+  if (error && !isLoading) {
     return (
       <div className="text-center p-8">
         <p className="text-red-500">Failed to load metrics. Please try again.</p>
+      </div>
+    )
+  }
+
+  if (!stats && !isLoading) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-muted-foreground">No data available for the selected period.</p>
       </div>
     )
   }

@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { onAuthStateChanged, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -22,6 +22,8 @@ interface UserProfile {
   onboardingCompleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  profilePicture?: string | null;
+  plan?: string;
 }
 
 interface AuthContextType {
@@ -52,53 +54,92 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      
-      if (user) {
-        // Fetch user profile from Firestore
-        try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            const userProfileData = userDoc.data() as UserProfile;
-            setUserProfile(userProfileData);
-            if (!userProfileData.onboardingCompleted) {
-              router.push('/onboarding');
-            }
-          } else {
-            // Create initial user profile
-            const initialProfile: UserProfile = {
-              displayName: user.displayName,
-              email: user.email,
-              photoURL: user.photoURL,
-              onboardingCompleted: false,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            };
-            await setDoc(doc(db, 'users', user.uid), initialProfile);
-            setUserProfile(initialProfile);
-            router.push('/onboarding');
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
+  // Memoize the auth state change handler
+  const handleAuthStateChange = useCallback(async (currentUser: User | null) => {
+    console.log('Auth state changed:', currentUser ? 'User logged in' : 'User logged out', currentUser?.uid);
+    
+    setUser(currentUser);
+    
+    if (currentUser) {
+      try {
+        // Try to fetch user profile, but don't fail if it doesn't exist
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        
+        // Set a basic profile first
+        const basicProfile: UserProfile = {
+          displayName: currentUser.displayName,
+          email: currentUser.email,
+          photoURL: currentUser.photoURL,
+          plan: 'free',
+          onboardingCompleted: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        setUserProfile(basicProfile);
+        
+        // Then try to fetch full profile
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setUserProfile(userDoc.data() as UserProfile);
+        } else {
+          // Create the profile document
+          await setDoc(userDocRef, basicProfile);
         }
-      } else {
-        setUserProfile(null);
+        
+      } catch (error: any) {
+        console.warn('Could not fetch/create user profile, using basic profile:', error.message);
+        // Don't throw - just continue with basic profile
       }
-      
-      setLoading(false);
+    } else {
+      setUserProfile(null);
+    }
+    
+    setLoading(false);
+  }, []);
+  
+
+  useEffect(() => {
+    // Set loading state immediately
+    setLoading(true);
+    
+    // Use a local variable to track component mount state
+    let isMounted = true;
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      // Only update state if component is still mounted
+      if (!isMounted) return;
+      handleAuthStateChange(user);
     });
 
-    return () => unsubscribe();
-  }, [router]);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [handleAuthStateChange]);
 
   const signIn = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign in error:', error);
-      throw error;
+      
+      // Re-throw with more user-friendly message
+      if (error.code === 'auth/network-request-failed') {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      } else if (error.code === 'auth/invalid-credential') {
+        throw new Error('Invalid email or password. Please try again.');
+      } else if (error.code === 'auth/invalid-login-credentials') {
+        throw new Error('Invalid email or password. Please try again.');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many failed login attempts. Please try again later.');
+      } else if (error.code === 'unavailable') {
+        throw new Error('Service unavailable. This may be due to network issues. Please try again later.');
+      } else if (error.message?.includes('Firebase is not available')) {
+        throw new Error('Firebase is not available. Please try again later.');
+      }
+      
+      throw new Error(error.message || 'An error occurred during login. Please try again.');
     }
   };
 
@@ -118,29 +159,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         onboardingCompleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
+        plan: 'free'
       };
       
       await setDoc(doc(db, 'users', newUser.uid), initialProfile);
       setUserProfile(initialProfile);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign up error:', error);
-      throw error;
+      
+      // Re-throw with more user-friendly message
+      if (error.code === 'auth/network-request-failed') {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      } else if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Email already in use. Please try another email or log in instead.');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address. Please check and try again.');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('Password is too weak. Please use a stronger password.');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many sign up attempts. Please try again later.');
+      } else if (error.code === 'unavailable') {
+        throw new Error('Service unavailable. This may be due to network issues. Please try again later.');
+      }
+      
+      throw new Error(error.message || 'An error occurred during sign up. Please try again.');
     }
   };
 
   const signOutUser = async () => {
     try {
-      await signOut(auth);
+      await firebaseSignOut(auth);
       router.push('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign out error:', error);
-      throw error;
+      
+      // Re-throw with more user-friendly message
+      if (error.code === 'auth/network-request-failed') {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      } else if (error.code === 'unavailable') {
+        throw new Error('Service unavailable. This may be due to network issues. Please try again later.');
+      }
+      
+      throw new Error(error.message || 'An error occurred during sign out. Please try again.');
     }
   };
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return;
-    
+    if (!user) {
+      throw new Error('No user found. Please log in and try again.');
+    }
+
     try {
       const updatedData = {
         ...data,
@@ -149,15 +217,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       await updateDoc(doc(db, 'users', user.uid), updatedData);
       setUserProfile(prev => prev ? { ...prev, ...updatedData } : null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update profile error:', error);
-      throw error;
+      
+      if (error.code === 'unavailable' || error.message?.includes('offline')) {
+        throw new Error('You appear to be offline. Please check your internet connection and try again.');
+      }
+      
+      throw new Error(error.message || 'An error occurred while updating your profile. Please try again.');
     }
   };
 
   const completeOnboarding = async (data: Partial<UserProfile>) => {
-    if (!user) return;
-    
+    if (!user) {
+      throw new Error('No user found. Please log in and try again.');
+    }
+
     try {
       const onboardingData = {
         ...data,
@@ -167,24 +242,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       await updateDoc(doc(db, 'users', user.uid), onboardingData);
       setUserProfile(prev => prev ? { ...prev, ...onboardingData } : null);
-      router.push('/dashboard');
-    } catch (error) {
+      router.push('/builder');
+    } catch (error: any) {
       console.error('Complete onboarding error:', error);
-      throw error;
+      
+      if (error.code === 'unavailable' || error.message?.includes('offline')) {
+        throw new Error('You appear to be offline. Please check your internet connection and try again.');
+      }
+      
+      throw new Error(error.message || 'An error occurred while completing onboarding. Please try again.');
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      userProfile,
-      loading,
-      signIn,
-      signUp,
-      signOutUser,
-      updateUserProfile,
-      completeOnboarding,
-    }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        userProfile, 
+        loading, 
+        signIn, 
+        signUp, 
+        signOutUser, 
+        updateUserProfile, 
+        completeOnboarding 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -35,6 +35,7 @@ export default function Chatbot() {
     abortRef.current = controller;
 
     setLoading(true);
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -65,62 +66,121 @@ export default function Chatbot() {
   }, []);
 
   return (
-    <div>
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Floating Chat Toggle Button */}
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        className="group bg-black dark:bg-white text-white dark:text-black w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center justify-center"
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
       >
-        {isOpen ? <X /> : <MessageSquare />}
+        {isOpen ? (
+          <X className="w-6 h-6 transition-transform duration-200 group-hover:rotate-90" />
+        ) : (
+          <MessageSquare className="w-6 h-6 transition-transform duration-200 group-hover:scale-110" />
+        )}
       </button>
 
+      {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 w-80 h-96 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col">
-          <div className="p-4 border-b border-gray-700">
-            <h3 className="font-semibold">Linku</h3>
+        <div className="absolute bottom-20 right-0 w-96 h-[32rem] bg-white dark:bg-black border border-[#E5E5E5] dark:border-[#222222] rounded-2xl shadow-2xl overflow-hidden backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          {/* Header */}
+          <div className="bg-[#F8F8F8] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-[#222222] p-4 flex justify-between items-center">
+            <h3 className="font-['Playfair_Display'] text-lg font-semibold text-black dark:text-white">
+              Linku
+            </h3>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-[#444444] dark:text-[#CCCCCC] hover:text-black dark:hover:text-white transition-colors duration-200 hover:scale-110"
+              aria-label="Close chat"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <div className="flex-1 p-4 overflow-y-auto">
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[22rem]">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`my-2 p-2 rounded-lg max-w-[85%] ${msg.sender === 'user' ? 'bg-blue-500 ml-auto' : 'bg-gray-700 mr-auto'}`}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 fade-in duration-300`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                <div
+                  className={`
+                    max-w-[80%] px-4 py-3 rounded-2xl font-['Inter'] text-sm leading-relaxed
+                    ${msg.sender === 'user'
+                      ? 'bg-black dark:bg-white text-white dark:text-black ml-4'
+                      : 'bg-[#F8F8F8] dark:bg-[#111111] text-black dark:text-white mr-4'
+                    }
+                    shadow-sm hover:shadow-md transition-shadow duration-200
+                  `}
+                >
+                  {msg.text}
+                </div>
               </div>
             ))}
+
+            {/* Loading Indicator */}
+            {loading && (
+              <div className="flex justify-start animate-in slide-in-from-bottom-2 fade-in">
+                <div className="bg-[#F8F8F8] dark:bg-[#111111] text-[#444444] dark:text-[#CCCCCC] px-4 py-3 rounded-2xl mr-4">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Empty State with Prebuilt Questions */}
             {messages.length === 0 && (
-              <div className="space-y-2">
-                <p className="text-sm text-gray-400">Or try one of these questions:</p>
-                {prebuiltQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSend(q)}
-                    className="w-full text-left p-2 bg-gray-700 rounded-lg text-sm hover:bg-gray-600"
-                  >
-                    {q}
-                  </button>
-                ))}
+              <div className="space-y-4 animate-in slide-in-from-bottom-3 fade-in duration-500">
+                <div className="text-center">
+                  <p className="text-[#444444] dark:text-[#CCCCCC] font-['Inter'] text-sm mb-4">
+                    Hi! How can I help you today?
+                  </p>
+                  <p className="text-[#444444] dark:text-[#CCCCCC] font-['Inter'] text-xs mb-4">
+                    Or try one of these questions:
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {prebuiltQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(q)}
+                      className="w-full text-left p-3 bg-[#F8F8F8] dark:bg-[#111111] hover:bg-[#E5E5E5] dark:hover:bg-[#222222] rounded-xl text-sm text-black dark:text-white font-['Inter'] transition-all duration-200 hover:scale-[1.02] hover:shadow-sm border border-transparent hover:border-[#E5E5E5] dark:hover:border-[#222222]"
+                      disabled={loading}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
-          <div className="p-4 border-t border-gray-700 flex">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              className="flex-1 p-2 border border-gray-600 bg-gray-700 rounded-lg disabled:opacity-60"
-              placeholder={loading ? "Thinking..." : "Ask me anything..."}
-              disabled={loading}
-            />
-            <button
-              onClick={() => handleSend()}
-              className="ml-2 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-60"
-              disabled={loading}
-              aria-label="Send message"
-            >
-              <Send />
-            </button>
+
+          {/* Input Area */}
+          <div className="border-t border-[#E5E5E5] dark:border-[#222222] p-4 bg-[#F8F8F8] dark:bg-[#111111]">
+            <div className="flex space-x-3">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                className="flex-1 p-3 border border-[#E5E5E5] dark:border-[#222222] bg-white dark:bg-black text-black dark:text-white rounded-xl font-['Inter'] text-sm placeholder-[#444444] dark:placeholder-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                placeholder={loading ? "Thinking..." : "Ask me anything..."}
+                disabled={loading}
+              />
+              <button
+                onClick={() => handleSend()}
+                className="p-3 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2 focus:ring-offset-[#F8F8F8] dark:focus:ring-offset-[#111111]"
+                disabled={loading}
+                aria-label="Send message"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       )}

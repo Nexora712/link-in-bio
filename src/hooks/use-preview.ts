@@ -1,6 +1,17 @@
 import { useState, useCallback } from 'react'
 import { renderLink } from '@/lib/links/link-renderer'
-import type { Link, LinkPreview } from '@/types/link'
+import type { LinkItem } from '@/types/link'
+
+interface Link extends LinkItem {
+  isActive: boolean;
+}
+
+interface LinkPreview {
+  title: string;
+  url: string;
+  displayUrl: string;
+  icon: string;
+}
 
 export function usePreview() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop')

@@ -17,7 +17,7 @@ import { usePathname } from "next/navigation"
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Palette, label: "Templates", href: "/dashboard/templates" },
+  { icon: Palette, label: "Templates", href: "/templates" },
   { icon: Plus, label: "Builder", href: "/builder" },
   { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
   { icon: User, label: "Account", href: "/dashboard/account" },

@@ -1,6 +1,11 @@
 import { useState, useCallback } from 'react'
 import { generateLinkId } from '@/lib/links/link-utils'
-import type { Link } from '@/types/link'
+import type { LinkItem } from '@/types/link'
+
+interface Link extends LinkItem {
+  order: number;
+  isActive: boolean;
+}
 
 export function useLinks() {
   const [links, setLinks] = useState<Link[]>([])

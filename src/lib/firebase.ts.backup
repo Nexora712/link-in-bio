@@ -1,0 +1,42 @@
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+
+// IMPORTANT: Replace this with your own Firebase project configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyB9i-ZppPkFvGBljvJ559joW8G6IvxFObY",
+  authDomain: "linknest-b67ed.firebaseapp.com",
+  projectId: "linknest-b67ed",
+  storageBucket: "linknest-b67ed.firebasestorage.app",
+  messagingSenderId: "874827019698",
+  appId: "1:874827019698:web:057d573f35d6f405bc60ab",
+  measurementId: "G-8X236DYQW9"
+};
+
+// Initialize Firebase only once
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+
+// Use getFirestore instead of initializeFirestore for better performance
+const db = getFirestore(app);
+
+// Enable offline persistence with better error handling
+if (typeof window !== 'undefined') {
+  enableIndexedDbPersistence(db)
+    .then(() => {
+      console.log('Firestore persistence enabled');
+    })
+    .catch((err) => {
+      if (err.code === 'failed-precondition') {
+        // Multiple tabs open, persistence can only be enabled in one tab at a time
+        console.log('Persistence failed: Multiple tabs open, using fallback');
+      } else if (err.code === 'unimplemented') {
+        // The current browser does not support persistence
+        console.log('Persistence not supported by browser, using fallback');
+      } else {
+        console.error('Unknown error enabling persistence:', err);
+      }
+    });
+}
+
+export { app, auth, db };

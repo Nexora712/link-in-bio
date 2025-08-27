@@ -1,0 +1,11 @@
+{
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/builder/page": "app/builder/page.js",
+  "/features/page": "app/features/page.js",
+  "/templates/page": "app/templates/page.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/analytics/page": "app/dashboard/analytics/page.js",
+  "/dashboard/account/page": "app/dashboard/account/page.js"
+}

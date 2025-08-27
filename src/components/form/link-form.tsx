@@ -9,11 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, X, Upload, User, FileText, Link as LinkIcon } from "lucide-react";
 import { ThemeSelector } from "@/components/theme/theme-selector";
 import { SocialLinks } from "@/components/form/social-links";
+import { trackLinkClick } from "@/lib/performance-utils";
+import { useAuth } from "@/contexts/auth-context";
 
 export interface LinkItem {
-  id: string;
-  title: string;
-  url: string;
+  id: string
+  title: string
+  url: string
+  description?: string
+  icon?: string
+  isActive?: boolean
 }
 
 export interface SocialLink {
@@ -53,6 +58,7 @@ export function LinkBuilderForm({
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
   const [bioPrompt, setBioPrompt] = useState('');
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+  const { user } = useAuth();
 
   const addLink = () => {
     const newLink: LinkItem = {
@@ -198,7 +204,12 @@ export function LinkBuilderForm({
               type="button"
               variant="outline"
               size="sm"
-              onClick={addLink}
+              onClick={() => {
+                addLink();
+                if (user) {
+                  trackLinkClick(user.uid);
+                }
+              }}
               className="flex items-center gap-1"
             >
               <Plus className="w-4 h-4" />
@@ -209,9 +220,9 @@ export function LinkBuilderForm({
         <CardContent className="space-y-4">
           <div className="space-y-4">
             {links.map((link, index) => (
-              <div key={link.id} className="space-y-3 p-4 border rounded-lg bg-gray-50/50">
+              <div key={link.id} className="space-y-3 p-4 border rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Link {index + 1}
                   </span>
                   {links.length > 1 && (
@@ -220,7 +231,7 @@ export function LinkBuilderForm({
                       variant="ghost"
                       size="sm"
                       onClick={() => removeLink(link.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 dark:hover:text-red-400"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -287,9 +298,9 @@ function BioModal({ isOpen, onClose, onGenerate, prompt, setPrompt, isGenerating
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h3 className="text-lg font-semibold mb-4">Generate Bio with AI</h3>
-        <p className="text-sm text-gray-600 mb-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">Generate Bio with AI</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
           Tell us a little about yourself, and our AI will craft a bio for you.
         </p>
         <Textarea

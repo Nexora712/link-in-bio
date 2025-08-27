@@ -83,17 +83,17 @@ export function SocialLinks({ onLinksChange }: SocialLinksProps) {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {socialLinks.map((link) => (
-            <div key={link.id} className="space-y-3 p-4 border rounded-lg bg-gray-50/50">
+            <div key={link.id} className="space-y-3 p-4 border rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
               {/* Platform Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {/* Platform Icon */}
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border shadow-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border shadow-sm dark:bg-gray-700 dark:border-gray-600">
                     {link.icon}
                   </div>
                   
                   {/* Platform Name */}
-                  <Label className="text-sm font-medium">{link.platform}</Label>
+                  <Label className="text-sm font-medium dark:text-gray-300">{link.platform}</Label>
                 </div>
                 
                 {/* Toggle Switch */}
@@ -118,8 +118,8 @@ export function SocialLinks({ onLinksChange }: SocialLinksProps) {
           ))}
         </div>
         
-        <div className="text-xs text-gray-500 mt-4 p-3 bg-blue-50 rounded-lg">
-          <p className="font-medium text-blue-900 mb-1">💡 Tip:</p>
+        <div className="text-xs text-gray-500 dark:text-gray-400 mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+          <p className="font-medium text-blue-900 dark:text-blue-200 mb-1">💡 Tip:</p>
           <p>Toggle the switches to add your social media profiles. Only active links with URLs will be displayed on your bio page.</p>
         </div>
       </CardContent>

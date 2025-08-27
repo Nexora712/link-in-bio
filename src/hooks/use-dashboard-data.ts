@@ -1,52 +1,115 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import type { UserStats, Notification, User, LinkAnalytics } from "@/types/dashboard"
+import { db, auth } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getApps, initializeApp } from 'firebase/app';
 
-// Mock API functions (replace with your actual API calls)
+import { useQuery } from "@tanstack/react-query";
+import type { UserStats, Notification, User, LinkAnalytics } from "@/types/dashboard";
+import { useAuth } from "@/contexts/auth-context";
+
+
 const fetchUserStats = async (): Promise<UserStats> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  return {
-    totalViews: Math.floor(Math.random() * 50000) + 10000,
-    linksCreated: Math.floor(Math.random() * 50) + 10,
-    themesUsed: Math.floor(Math.random() * 15) + 3,
-    profileVisits: Math.floor(Math.random() * 5000) + 500,
-    viewsChange: Math.floor(Math.random() * 50) + 10,
-    linksChange: Math.floor(Math.random() * 10) + 1,
-    themesChange: Math.floor(Math.random() * 5) + 1,
-    visitsChange: Math.floor(Math.random() * 30) + 5,
+  const { user, loading } = useAuth();
+
+  if (loading || !user) {
+    return {
+      totalViews: 0,
+      linksCreated: 0,
+      themesUsed: 0,
+      profileVisits: 0,
+      viewsChange: 0,
+      linksChange: 0,
+      themesChange: 0,
+      visitsChange: 0,
+    };
   }
-}
+
+  try {
+    const userId = user.uid;
+    const currentDate = new Date();
+    const endDate = currentDate.toISOString().slice(0, 10);
+    const startDate = new Date(currentDate.setDate(currentDate.getDate() - 7)).toISOString().slice(0, 10);
+
+    let totalViews = 0;
+    let linksCreated = 0;
+    let profileVisits = 0;
+    let themesUsed = 0;
+
+    // Fetch analytics data for the last 7 days
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const analyticsDocRef = doc(db, `users/${userId}/analytics/${date}`, "data");
+      const analyticsDocSnap = await getDoc(analyticsDocRef);
+
+      if (analyticsDocSnap.exists()) {
+        const data = analyticsDocSnap.data();
+        totalViews += data?.linkClicks || 0;
+        profileVisits += data?.profileViews || 0;
+      }
+    }
+
+    return {
+      totalViews,
+      linksCreated,
+      themesUsed,
+      profileVisits,
+      viewsChange: 0, // Not implemented
+      linksChange: 0, // Not implemented
+      themesChange: 0, // Not implemented
+      visitsChange: 0, // Not implemented
+    };
+  } catch (error: any) {
+    console.error("Error fetching user stats:", error);
+    return {
+      totalViews: 0,
+      linksCreated: 0,
+      themesUsed: 0,
+      profileVisits: 0,
+      viewsChange: 0,
+      linksChange: 0,
+      themesChange: 0,
+      visitsChange: 0,
+    };
+  }
+};
 
 const fetchNotifications = async (): Promise<Notification[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  return [
+  const { user } = useAuth();
+  if (!user) {
+    return [];
+  }
+
+  // Mock data based on user activity
+  const notifications: Notification[] = [
     {
-      id: "1",
-      title: "New Link Click",
-      message: "Your Instagram link was clicked 5 times",
+      id: "login",
+      title: "User Login",
+      message: `User ${user.email} logged in`,
       type: "info",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+      timestamp: new Date(),
       read: false,
     },
     {
-      id: "2",
-      title: "Profile View Milestone",
-      message: "Your profile reached 1,000 views!",
-      type: "success",
+      id: "link_click",
+      title: "New Link Click",
+      message: "Your Instagram link was clicked 5 times",
+      type: "info",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
       read: false,
     },
     {
-      id: "3",
+      id: "theme_update",
       title: "Theme Updated",
       message: "Successfully switched to Dark Modern theme",
       type: "success",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
       read: true,
     },
-  ]
-}
+  ];
+
+  return notifications;
+};
 
 const fetchCurrentUser = async (): Promise<User> => {
   await new Promise((resolve) => setTimeout(resolve, 500))
@@ -89,19 +152,39 @@ const fetchLinkAnalytics = async (): Promise<LinkAnalytics[]> => {
 }
 
 export const useUserStats = () => {
+  const { loading } = useAuth();
+
   return useQuery({
     queryKey: ["user-stats"],
     queryFn: fetchUserStats,
+    enabled: !loading,
     refetchInterval: 30000,
-  })
-}
+    retry: 3, // Retry the query up to 3 times
+  });
+};
 
 export const useNotifications = () => {
-  return useQuery({
+  const { data, ...rest } = useQuery({
     queryKey: ["notifications"],
     queryFn: fetchNotifications,
     refetchInterval: 60000,
-  })
+  });
+
+  const activities = data ? data.map((notification) => ({
+    id: notification.id,
+    action: notification.title,
+    details: notification.message,
+    timestamp: notification.timestamp,
+    type: notification.title.toLowerCase().includes("link")
+      ? "link"
+      : notification.title.toLowerCase().includes("theme")
+      ? "theme"
+      : notification.title.toLowerCase().includes("view")
+      ? "view"
+      : "click",
+  })) : [];
+
+  return { activities, ...rest };
 }
 
 export const useCurrentUser = () => {
